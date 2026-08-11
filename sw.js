@@ -1,5 +1,5 @@
 const CACHE_PREFIX='merecad::';
-const CACHE=`${CACHE_PREFIX}v2.4`;
+const CACHE=`${CACHE_PREFIX}v2.5`;
 const APP_BASE='/mereCad/';
 const ASSETS=['./','./index.html','./styles.css','./cad-controls.css','./cad-ribbon.css','./cad-ribbon-extra.css','./compact-layout.css','./cad-navigation.css','./shape-library.css','./floor-symbols.css','./firebase-ui.css','./firebase-init.js','./app.js','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable-512.png'];
 
