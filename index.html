@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#172521">
+  <meta name="description" content="MereCad — editor de planos arquitectónicos en el navegador">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="cad-controls.css">
+  <link rel="stylesheet" href="cad-ribbon.css">
+  <link rel="stylesheet" href="cad-ribbon-extra.css">
+  <link rel="stylesheet" href="compact-layout.css">
+  <link rel="stylesheet" href="cad-navigation.css">
+  <link rel="stylesheet" href="shape-library.css">
+  <link rel="stylesheet" href="floor-symbols.css">
+  <link rel="stylesheet" href="firebase-ui.css">
+  <title>MereCad — Planos arquitectónicos</title>
+</head>
+<body class="auth-pending">
+  <section id="authView" class="auth-view">
+    <article class="auth-card"><div class="auth-logo"><span>M</span><div><b>MereCad</b><small>Planos arquitectónicos en la nube</small></div></div>
+      <form id="loginForm"><h1>Iniciar sesión</h1><label>Correo electrónico<input id="loginEmailInput" type="email" autocomplete="email" required></label><label>Contraseña<input id="loginPasswordInput" type="password" autocomplete="current-password" minlength="6" required></label><button class="primary" type="submit">Entrar</button><p id="loginMessage" class="auth-message"></p><p>¿No tienes cuenta? <button id="showRegisterButton" type="button" class="text-button">Crear cuenta</button></p></form>
+      <form id="registerForm" hidden><h1>Crear cuenta</h1><label>Nombre<input id="registerNameInput" autocomplete="name" maxlength="80" required></label><label>Correo electrónico<input id="registerEmailInput" type="email" autocomplete="email" required></label><label>Contraseña<input id="registerPasswordInput" type="password" autocomplete="new-password" minlength="6" required></label><button class="primary" type="submit">Crear y entrar</button><p id="registerMessage" class="auth-message"></p><p>¿Ya tienes cuenta? <button id="showLoginButton" type="button" class="text-button">Iniciar sesión</button></p></form>
+    </article>
+  </section>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">M</span><span>MereCad</span><span class="beta" title="Versión de MereCad">v2.2</span></div>
+    <div class="project-title"><input id="projectName" value="Dibujo 1" aria-label="Nombre del proyecto"><span id="saveState">Guardado en la nube</span></div>
+    <nav class="top-actions" aria-label="Acciones del proyecto">
+      <button id="undoBtn" class="icon-btn" title="Deshacer (Ctrl+Z)">↶</button>
+      <button id="redoBtn" class="icon-btn" title="Rehacer (Ctrl+Y)">↷</button>
+      <button id="newBtn" class="secondary">Nuevo</button>
+      <button id="openBtn" class="secondary">Abrir</button>
+      <button id="saveBtn" class="secondary">Guardar</button>
+      <button id="exportBtn" class="primary">Exportar PNG</button>
+      <span id="currentUserLabel" class="user-label"></span><button id="signOutButton" class="icon-btn" title="Cerrar sesión">⇥</button>
+    </nav>
+  </header>
+  <nav class="cad-ribbon compact-ribbon" aria-label="Comandos de edición">
+    <details class="command-menu"><summary>Modificar <span>⌄</span></summary><div class="command-panel"><button class="ribbon-action" data-action="move" data-tip="Mover; arrastra o usa flechas"><span class="glyph-icon">✥</span><b>Mover</b><kbd>Flechas</kbd></button><button class="ribbon-action" data-action="rotate" data-tip="Girar selección 90°"><span>↻</span><b>Girar 90°</b></button><button class="ribbon-action" data-action="duplicate" data-tip="Duplicar selección"><span class="icon-copy"></span><b>Duplicar</b><kbd>Ctrl+D</kbd></button><button class="ribbon-action destructive" data-action="delete" data-tip="Eliminar selección"><span>×</span><b>Eliminar</b><kbd>Supr</kbd></button></div></details>
+    <details class="command-menu"><summary>Alinear <span>⌄</span></summary><div class="command-panel"><button class="ribbon-action" data-action="alignLeft"><span>⇤</span><b>Izquierda</b></button><button class="ribbon-action" data-action="alignTop"><span>⇡</span><b>Superior</b></button><button class="ribbon-action" data-action="alignHCenter"><span>↔</span><b>Centro horizontal</b></button><button class="ribbon-action" data-action="alignVCenter"><span>↕</span><b>Centro vertical</b></button></div></details>
+    <details class="command-menu"><summary>Organizar <span>⌄</span></summary><div class="command-panel"><button class="ribbon-action" data-action="group"><span>⛶</span><b>Agrupar</b><kbd>Ctrl+G</kbd></button><button class="ribbon-action" data-action="ungroup"><span>⛶</span><b>Desagrupar</b></button><button class="ribbon-action" data-action="front"><span>▣</span><b>Traer al frente</b></button><button class="ribbon-action" data-action="back"><span>▣</span><b>Enviar al fondo</b></button></div></details>
+    <details class="command-menu"><summary>Portapapeles <span>⌄</span></summary><div class="command-panel"><button class="ribbon-action" data-action="copy"><span>▣</span><b>Copiar</b><kbd>Ctrl+C</kbd></button><button class="ribbon-action" data-action="paste"><span>▤</span><b>Pegar</b><kbd>Ctrl+V</kbd></button></div></details>
+  </nav>
+
+  <main class="workspace">
+    <aside class="tools" aria-label="Herramientas">
+      <button class="tool active" data-tool="select"><span>↖</span>Seleccionar <kbd>V</kbd></button>
+      <div class="tool-group"><p>Construir</p>
+        <button class="tool" data-tool="wall"><span>╱</span>Muro <kbd>W</kbd></button>
+        <button class="tool" data-tool="room"><span>□</span>Habitación <kbd>R</kbd></button>
+        <button class="tool" data-tool="door"><span>⌒</span>Puerta <kbd>D</kbd></button>
+        <button class="tool" data-tool="window"><span>═</span>Ventana <kbd>N</kbd></button>
+      </div>
+      <div class="tool-group"><p>Anotar</p>
+        <button class="tool" data-tool="dimension"><span>↔</span>Cota <kbd>M</kbd></button>
+        <button class="tool" data-tool="text"><span>T</span>Texto <kbd>T</kbd></button>
+      </div>
+      <section class="shape-library" aria-label="Biblioteca de figuras">
+        <h3>Figuras de vivienda</h3>
+        <details><summary>Baño <span>4</span></summary><div class="shape-grid"><button class="shape" draggable="true" data-symbol="WC" data-label="Inodoro">◉<small>Inodoro</small></button><button class="shape" draggable="true" data-symbol="LV" data-label="Lavabo">◒<small>Lavabo</small></button><button class="shape" draggable="true" data-symbol="RG" data-label="Regadera">⌗<small>Regadera</small></button><button class="shape" draggable="true" data-symbol="TN" data-label="Tina">▭<small>Tina</small></button></div></details>
+        <details><summary>Cocina <span>4</span></summary><div class="shape-grid"><button class="shape" draggable="true" data-symbol="FR" data-label="Fregadero">◫<small>Fregadero</small></button><button class="shape" draggable="true" data-symbol="ES" data-label="Estufa">⊞<small>Estufa</small></button><button class="shape" draggable="true" data-symbol="RF" data-label="Refrigerador">▥<small>Refrigerador</small></button><button class="shape" draggable="true" data-symbol="IS" data-label="Isla">▬<small>Isla</small></button></div></details>
+        <details><summary>Eléctrico <span>4</span></summary><div class="shape-grid"><button class="shape" draggable="true" data-symbol="CT" data-label="Contacto">⊙<small>Contacto</small></button><button class="shape" draggable="true" data-symbol="AP" data-label="Apagador">◐<small>Apagador</small></button><button class="shape" draggable="true" data-symbol="LU" data-label="Luminaria">☼<small>Luminaria</small></button><button class="shape" draggable="true" data-symbol="TB" data-label="Tablero">▦<small>Tablero</small></button></div></details>
+        <details><summary>Recámara <span>4</span></summary><div class="shape-grid"><button class="shape" draggable="true" data-symbol="C1" data-label="Cama individual">▱<small>Cama indiv.</small></button><button class="shape" draggable="true" data-symbol="C2" data-label="Cama matrimonial">▰<small>Cama doble</small></button><button class="shape" draggable="true" data-symbol="BU" data-label="Buró">▪<small>Buró</small></button><button class="shape" draggable="true" data-symbol="CL" data-label="Clóset">▤<small>Clóset</small></button></div></details>
+        <details><summary>Muebles <span>4</span></summary><div class="shape-grid"><button class="shape" draggable="true" data-symbol="SO" data-label="Sofá">▰<small>Sofá</small></button><button class="shape" draggable="true" data-symbol="ME" data-label="Mesa">◯<small>Mesa</small></button><button class="shape" draggable="true" data-symbol="SI" data-label="Silla">□<small>Silla</small></button><button class="shape" draggable="true" data-symbol="EC" data-label="Escritorio">▱<small>Escritorio</small></button></div></details>
+        <details><summary>Sala y comedor <span>6</span></summary><div class="shape-grid"><button class="shape" draggable="true" data-symbol="SE3" data-label="Sofá de tres plazas">▰<small>Sofá 3 plazas</small></button><button class="shape" draggable="true" data-symbol="SEC" data-label="Sofá seccional">⌐<small>Sofá en L</small></button><button class="shape" draggable="true" data-symbol="PO" data-label="Sillón">▣<small>Sillón</small></button><button class="shape" draggable="true" data-symbol="MC" data-label="Mesa de centro">▭<small>Mesa centro</small></button><button class="shape" draggable="true" data-symbol="TD6" data-label="Comedor para seis">▭<small>Comedor 6</small></button><button class="shape" draggable="true" data-symbol="BN" data-label="Banco">▬<small>Banco</small></button></div></details>
+        <details><summary>Oficina <span>4</span></summary><div class="shape-grid"><button class="shape" draggable="true" data-symbol="EO" data-label="Escritorio ejecutivo">▱<small>Escritorio</small></button><button class="shape" draggable="true" data-symbol="SOF" data-label="Silla de oficina">◉<small>Silla oficina</small></button><button class="shape" draggable="true" data-symbol="LB" data-label="Librero">▥<small>Librero</small></button><button class="shape" draggable="true" data-symbol="JM" data-label="Mesa de juntas">▭<small>Mesa juntas</small></button></div></details>
+        <details><summary>Servicios <span>4</span></summary><div class="shape-grid"><button class="shape" draggable="true" data-symbol="LA" data-label="Lavadora">◉<small>Lavadora</small></button><button class="shape" draggable="true" data-symbol="SE" data-label="Secadora">◍<small>Secadora</small></button><button class="shape" draggable="true" data-symbol="BO" data-label="Boiler">○<small>Boiler</small></button><button class="shape" draggable="true" data-symbol="AC" data-label="Aire acondicionado">≋<small>Aire acond.</small></button></div></details>
+        <details><summary>Exterior <span>4</span></summary><div class="shape-grid"><button class="shape" draggable="true" data-symbol="AR" data-label="Árbol">♧<small>Árbol</small></button><button class="shape" draggable="true" data-symbol="AU" data-label="Automóvil">▰<small>Automóvil</small></button><button class="shape" draggable="true" data-symbol="PL" data-label="Planta">✤<small>Planta</small></button><button class="shape" draggable="true" data-symbol="AS" data-label="Asador">▦<small>Asador</small></button></div></details>
+      </section>
+      <div class="tool-tip"><b>Navegación CAD</b><br>Rueda: zoom al puntero.<br>Rueda presionada: mover lienzo.</div>
+    </aside>
+
+    <section class="canvas-area">
+      <div class="canvas-toolbar">
+        <span id="floorLabel">Planta baja</span>
+        <span class="separator"></span>
+        <button id="gridBtn" class="mini active"># Cuadrícula</button>
+        <button id="snapBtn" class="mini active">⊕ Ajustar</button>
+        <span class="scale">Escala 1:50</span>
+      </div>
+      <div id="stage" tabindex="0" aria-label="Lienzo del plano">
+        <canvas id="planCanvas"></canvas>
+        <div id="emptyHint"><strong>Dibuja tu primer muro</strong><span>Haz clic y arrastra sobre el lienzo</span></div>
+        <div id="cursorCoords">0.00 m, 0.00 m</div>
+      </div>
+      <div class="zoom-controls"><button id="zoomOut">−</button><span id="zoomLabel">100%</span><button id="zoomIn">+</button><button id="zoomFit">⌗</button></div>
+    </section>
+
+    <aside class="properties">
+      <div class="panel-head"><h2>Propiedades</h2><button id="closePanel">×</button></div>
+      <div id="noSelection" class="no-selection"><div class="selection-icon">↖</div><h3>Nada seleccionado</h3><p>Selecciona un elemento del plano para editar sus propiedades.</p></div>
+      <div id="selectionProps" hidden>
+        <label>Tipo<input id="propType" disabled></label>
+        <label>Etiqueta<input id="propLabel" placeholder="Sin etiqueta"></label>
+        <label id="lengthRow">Longitud<input id="propLength" disabled></label>
+        <div class="field-grid"><label>Posición X<input id="propX" type="number" step="0.1"></label><label>Posición Y<input id="propY" type="number" step="0.1"></label></div>
+        <div class="field-grid"><label>Ancho<input id="propWidth" type="number" min="0" step="0.1"></label><label>Alto<input id="propHeight" type="number" min="0" step="0.1"></label></div>
+        <label>Color<input id="propColor" type="color" value="#172521"></label>
+        <p class="control-title">Alinear selección</p>
+        <div class="control-row"><button id="alignLeft" title="Alinear izquierda">⇤</button><button id="alignHCenter" title="Centrar horizontalmente">↔</button><button id="alignTop" title="Alinear arriba">⇡</button><button id="alignVCenter" title="Centrar verticalmente">↕</button></div>
+        <p class="control-title">Organizar</p>
+        <div class="control-row"><button id="duplicateBtn" title="Duplicar (Ctrl+D)">Duplicar</button><button id="bringFront" title="Traer al frente">Al frente</button><button id="sendBack" title="Enviar atrás">Atrás</button></div>
+        <div class="control-row"><button id="groupBtn" title="Agrupar (Ctrl+G)">Agrupar</button><button id="ungroupBtn" title="Desagrupar">Separar</button><button id="rotateBtn" title="Girar 90°">Girar 90°</button></div>
+        <button id="deleteBtn" class="danger">Eliminar elemento</button>
+      </div>
+      <div class="layers"><h3>Capas</h3><label><input type="checkbox" checked data-layer="walls"> Muros</label><label><input type="checkbox" checked data-layer="openings"> Puertas y ventanas</label><label><input type="checkbox" checked data-layer="furniture"> Figuras</label><label><input type="checkbox" checked data-layer="annotations"> Anotaciones</label></div>
+    </aside>
+  </main>
+  <div id="toast" role="status"></div>
+  <dialog id="cloudDialog" class="cloud-dialog"><div class="cloud-head"><div><h2>Mis dibujos</h2><p>Planos guardados en Firebase</p></div><button id="closeCloudDialog" aria-label="Cerrar">×</button></div><div id="cloudList" class="cloud-list"><p class="cloud-empty">Cargando…</p></div></dialog>
+  <script src="app.js"></script>
+  <script type="module" src="firebase-init.js"></script>
+</body>
+</html>
