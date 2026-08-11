@@ -1,10 +1,10 @@
 {
-  "id": "./",
+  "id": "/mereCad/",
   "name": "MereCad — Planos arquitectónicos",
   "short_name": "MereCad",
   "description": "Crea y guarda planos arquitectónicos desde cualquier dispositivo.",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/mereCad/",
+  "scope": "/mereCad/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone"],
   "orientation": "any",
